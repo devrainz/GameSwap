@@ -22,7 +22,7 @@ def install(prefix, destdir):
     assets = data / "assets"
     assets.mkdir(exist_ok=True)
     shutil.copyfile(ROOT / "assets/logo.png", assets / "logo.png")
-    for source, relative in ((ROOT / "assets/logo.png", f"share/icons/hicolor/scalable/apps/{APP_ID}.png"),
+    for source, relative in ((ROOT / "assets/logo.png", f"share/icons/hicolor/512x512/apps/{APP_ID}.png"),
                              (ROOT / f"data/{APP_ID}.metainfo.xml", f"share/metainfo/{APP_ID}.metainfo.xml"),
                              (ROOT / "LICENSE", "share/licenses/gameswap/LICENSE")):
         target = base / relative

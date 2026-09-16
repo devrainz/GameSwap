@@ -40,11 +40,11 @@ GameSwap currently supports two transfer modes:
 
 ---
 
-## Preview
+## Main UI Preview
 
-> **Coming soon**
-
-Screenshots of the GTK4/libadwaita interface will be added here after the current UI has finished being tested.
+<p align="center">
+  <img src="assets/preview.png" alt="GameSwap interface preview">
+</p>
 
 ---
 

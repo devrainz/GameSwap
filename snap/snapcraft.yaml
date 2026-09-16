@@ -1,0 +1,48 @@
+name: gameswap
+version: '2.1.0'
+summary: Swap installed Steam games between libraries
+description: |
+  Select one game from each Steam library and swap their locations.
+  GameSwap verifies copied files and keeps checkpoints for interrupted transfers.
+base: core24
+grade: devel
+confinement: strict
+license: MIT
+platforms:
+  amd64:
+
+apps:
+  gameswap:
+    extensions: [gnome]
+    command: bin/gameswap-snap
+    desktop: usr/share/applications/io.github.devrainz.GameSwap.desktop
+    common-id: io.github.devrainz.GameSwap
+    plugs: [home, removable-media, steam-data, system-observe]
+    slots: [gameswap-dbus]
+    environment:
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages
+      XDG_STATE_HOME: $SNAP_USER_COMMON/state
+
+plugs:
+  steam-data:
+    interface: personal-files
+    write:
+      - $HOME/.steam
+      - $HOME/.local/share/Steam
+      - $HOME/.var/app/com.valvesoftware.Steam
+
+slots:
+  gameswap-dbus:
+    interface: dbus
+    bus: session
+    name: io.github.devrainz.GameSwap
+
+parts:
+  gameswap:
+    plugin: nil
+    source: .
+    build-packages: [python3, make]
+    stage-packages: [python3, python3-gi, gir1.2-gtk-4.0, gir1.2-adw-1, rsync, procps]
+    override-build: |
+      python3 packaging/install.py --prefix /usr --destdir "$CRAFT_PART_INSTALL"
+      install -Dm755 packaging/gameswap-snap "$CRAFT_PART_INSTALL/bin/gameswap-snap"

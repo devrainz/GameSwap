@@ -1,0 +1,16 @@
+pkgname=gameswap
+pkgver=2.1.0
+pkgrel=1
+pkgdesc='Swap installed Steam games between libraries with a native libadwaita interface'
+arch=('any')
+url='https://github.com/devrainz/GameSwap'
+license=('MIT')
+depends=('python>=3.11' 'python-gobject' 'gtk4>=4.8' 'libadwaita>=1.2' 'rsync' 'procps-ng')
+makedepends=('make')
+source=("GameSwap-$pkgver.tar.gz::$url/releases/download/v$pkgver/GameSwap-$pkgver.tar.gz")
+sha256sums=('REPLACE_WITH_RELEASE_SHA256')
+
+package() {
+    cd "GameSwap-$pkgver"
+    make install PREFIX=/usr DESTDIR="$pkgdir"
+}

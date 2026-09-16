@@ -1,0 +1,38 @@
+{
+  "app-id": "io.github.devrainz.GameSwap",
+  "runtime": "org.gnome.Platform",
+  "runtime-version": "49",
+  "sdk": "org.gnome.Sdk",
+  "command": "gameswap",
+  "finish-args": [
+    "--share=ipc",
+    "--socket=wayland",
+    "--socket=fallback-x11",
+    "--device=dri",
+    "--filesystem=home",
+    "--filesystem=/mnt",
+    "--filesystem=/media",
+    "--filesystem=/run/media",
+    "--filesystem=~/.var/app/com.valvesoftware.Steam",
+    "--talk-name=org.freedesktop.Flatpak"
+  ],
+  "modules": [
+    {
+      "name": "rsync",
+      "buildsystem": "autotools",
+      "config-opts": ["--disable-xxhash", "--disable-zstd", "--disable-lz4", "--disable-openssl", "--disable-md2man"],
+      "sources": [{
+        "type": "archive",
+        "url": "https://download.samba.org/pub/rsync/src/rsync-3.5.0.tar.gz",
+        "sha256": "c7ffd1ef653e99540f661e47cb00b7f9cad1ee6b972399b16f93d672656e0d33"
+      }],
+      "cleanup": ["/share/man", "/bin/rsync-ssl"]
+    },
+    {
+      "name": "gameswap",
+      "buildsystem": "simple",
+      "build-commands": ["python3 packaging/install.py --prefix /app"],
+      "sources": [{"type": "dir", "path": "../..", "skip": ["dist", "build", "build-flatpak", ".git", ".venv", "__pycache__"]}]
+    }
+  ]
+}

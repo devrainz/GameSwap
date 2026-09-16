@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.devrainz.GameSwap</id>
+  <name>GameSwap</name>
+  <summary>Swap installed Steam games between libraries</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="io.github.devrainz"><name>Rainz</name></developer>
+  <description>
+    <p>Choose a game from each Steam library and swap their locations with a native, responsive interface.</p>
+    <p>GameSwap copies and verifies game files and related Steam data before removing originals. Interrupted operations keep a recovery checkpoint.</p>
+    <ul>
+      <li>Search installed games by name or Steam AppID</li>
+      <li>Review both moves before starting</li>
+      <li>Track copy and verification progress</li>
+      <li>Resume interrupted swaps without discarding verified copies</li>
+    </ul>
+  </description>
+  <launchable type="desktop-id">io.github.devrainz.GameSwap.desktop</launchable>
+  <url type="homepage">https://github.com/devrainz/GameSwap</url>
+  <url type="bugtracker">https://github.com/devrainz/GameSwap/issues</url>
+  <url type="vcs-browser">https://github.com/devrainz/GameSwap</url>
+  <provides><binary>gameswap</binary></provides>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="2.1.0" date="2026-09-15">
+      <description><p>Native libadwaita interface and Linux package build support.</p></description>
+    </release>
+  </releases>
+</component>

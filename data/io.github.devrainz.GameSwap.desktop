@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=GameSwap
+Comment=Swap installed Steam games between libraries
+Exec=gameswap
+Icon=io.github.devrainz.GameSwap
+Terminal=false
+Categories=Game;Utility;
+Keywords=Steam;Library;Storage;SSD;Swap;
+StartupNotify=true

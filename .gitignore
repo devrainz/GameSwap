@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+.gameswap_state.json
+build/
+dist/

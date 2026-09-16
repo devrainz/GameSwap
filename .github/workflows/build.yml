@@ -1,34 +1,54 @@
 name: Build GameSwap
+
 on:
   push:
     branches: [main]
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+
 permissions:
   contents: read
+
 jobs:
   native:
     runs-on: ubuntu-24.04
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Install test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y python3-gi gir1.2-gtk-4.0 gir1.2-adw-1 rsync xvfb dbus-x11 desktop-file-utils appstream
+          sudo apt-get install -y \
+            python3-gi \
+            gir1.2-gtk-4.0 \
+            gir1.2-adw-1 \
+            rsync \
+            xvfb \
+            dbus-x11 \
+            desktop-file-utils \
+            appstream
+
       - name: Validate version and metadata
         run: |
-          if [[ "$GITHUB_REF_TYPE" == tag ]]; then test "$GITHUB_REF_NAME" = "v$(python3 gameswap.py --version | awk '{print $2}')"; fi
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            test "$GITHUB_REF_NAME" = "v$(python3 gameswap.py --version | awk '{print $2}')"
+          fi
+
           desktop-file-validate data/io.github.devrainz.GameSwap.desktop
           appstreamcli validate --no-net data/io.github.devrainz.GameSwap.metainfo.xml
+
       - name: Test engine and UI
         run: |
           /usr/bin/python3 -m unittest discover -s tests -v
           dbus-run-session -- xvfb-run -a /usr/bin/python3 tests/gui_smoke.py
+
       - name: Build source and Debian package
         run: |
           python3 packaging/prepare-release.py --repository "$GITHUB_REPOSITORY"
           bash packaging/build-deb.sh
+
       - uses: actions/upload-artifact@v4
         with:
           name: native-packages
@@ -38,50 +58,101 @@ jobs:
             dist/aur/
             dist/flathub/
             dist/SOURCE-SHA256.txt
+
+
   flatpak:
     runs-on: ubuntu-24.04
+
     steps:
       - uses: actions/checkout@v4
-      - run: |
+
+      - name: Install Flatpak dependencies
+        run: |
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
-          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+          flatpak remote-add \
+            --user \
+            --if-not-exists \
+            flathub \
+            https://flathub.org/repo/flathub.flatpakrepo
+
+          flatpak install \
+            --user \
+            -y \
+            flathub \
+            org.gnome.Sdk//49
+
+          flatpak install \
+            --user \
+            -y \
+            flathub \
+            org.gnome.Platform//49
+
+      - name: Build Flatpak
+        run: |
           bash packaging/build-flatpak.sh
+
       - uses: actions/upload-artifact@v4
         with:
           name: flatpak-x86_64
           path: dist/*.flatpak
+
+
   rpm:
     runs-on: ubuntu-24.04
     container: fedora:43
+
     steps:
       - uses: actions/checkout@v4
-      - run: |
+
+      - name: Build RPM packages
+        run: |
           dnf install -y rpm-build python3 make
+
           python3 packaging/prepare-release.py
+
           mkdir -p "$GITHUB_WORKSPACE/rpmbuild/SOURCES"
-          cp dist/GameSwap-*.tar.gz "$GITHUB_WORKSPACE/rpmbuild/SOURCES/"
-          rpmbuild -ba --define "_topdir $GITHUB_WORKSPACE/rpmbuild" packaging/gameswap.spec
+
+          cp dist/GameSwap-*.tar.gz \
+            "$GITHUB_WORKSPACE/rpmbuild/SOURCES/"
+
+          rpmbuild \
+            -ba \
+            --define "_topdir $GITHUB_WORKSPACE/rpmbuild" \
+            packaging/gameswap.spec
+
       - uses: actions/upload-artifact@v4
         with:
           name: rpm-packages
           path: |
             rpmbuild/RPMS/**/*.rpm
             rpmbuild/SRPMS/*.rpm
+
+
   arch:
     runs-on: ubuntu-24.04
     container: archlinux:base-devel
+
     steps:
       - uses: actions/checkout@v4
-      - run: |
+
+      - name: Build Arch package
+        run: |
           pacman -Syu --noconfirm python git sudo
+
           python3 packaging/prepare-release.py
+
           cp dist/GameSwap-*.tar.gz dist/aur/
+
           useradd --create-home builder
           chown -R builder:builder dist/aur
+
           cd dist/aur
+
           sudo -u builder makepkg --nodeps --noconfirm
           sudo -u builder makepkg --printsrcinfo > .SRCINFO
+
       - uses: actions/upload-artifact@v4
         with:
           name: arch-package
@@ -90,31 +161,49 @@ jobs:
             dist/aur/PKGBUILD
             dist/aur/.SRCINFO
           include-hidden-files: true
+
+
   snap:
     runs-on: ubuntu-24.04
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Build Snap
         id: snapcraft
         uses: snapcore/action-build@v1
+
       - uses: actions/upload-artifact@v4
         with:
           name: snap-amd64
           path: ${{ steps.snapcraft.outputs.snap }}
+
+
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: [native, flatpak, rpm, arch, snap]
     runs-on: ubuntu-24.04
+
     permissions:
       contents: write
+
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: release-assets
+
       - name: Publish GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p release
-          find release-assets -type f -exec cp {} release/ \;
-          gh release create "$GITHUB_REF_NAME" release/* --title "GameSwap $GITHUB_REF_NAME" --generate-notes
+
+          find release-assets \
+            -type f \
+            -exec cp {} release/ \;
+
+          gh release create \
+            "$GITHUB_REF_NAME" \
+            release/* \
+            --title "GameSwap $GITHUB_REF_NAME" \
+            --generate-notes

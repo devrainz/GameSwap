@@ -30,7 +30,7 @@ Native GTK4 and libadwaita application for verified, resumable swaps of Steam ga
 %{_bindir}/gameswap
 %{_datadir}/gameswap/
 %{_datadir}/applications/io.github.devrainz.GameSwap.desktop
-%{_datadir}/icons/hicolor/scalable/apps/io.github.devrainz.GameSwap.png
+%{_datadir}/icons/hicolor/512x512/apps/io.github.devrainz.GameSwap.png
 %{_datadir}/metainfo/io.github.devrainz.GameSwap.metainfo.xml
 %license %{_datadir}/licenses/gameswap/LICENSE
 

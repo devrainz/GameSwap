@@ -188,6 +188,8 @@ jobs:
       contents: write
 
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           path: release-assets
@@ -205,5 +207,6 @@ jobs:
           gh release create \
             "$GITHUB_REF_NAME" \
             release/* \
+            --repo "$GITHUB_REPOSITORY" \
             --title "GameSwap $GITHUB_REF_NAME" \
             --generate-notes
